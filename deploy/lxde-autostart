@@ -1,0 +1,5 @@
+@xset s off
+@xset -dpms
+@xset s noblank
+@chromium-browser --incognito --disable-pinch --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required --no-user-gesture-required --noerrdialogs --kiosk http://localhost:7777/index.html
+@unclutter -idle 0

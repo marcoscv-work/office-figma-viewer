@@ -1,0 +1,16 @@
+[Unit]
+Description=Design Dashboard Carousel
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/design-dashboard-carousel
+ExecStart=/usr/local/bin/node /home/pi/design-dashboard-carousel/server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

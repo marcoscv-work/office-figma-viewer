@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design Dashboard Config</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #05070b;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px;
+      box-sizing: border-box;
+      border: 1px solid #22314f;
+      background: #0b1020;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 24px;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 8px;
+      color: #bdd2ff;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      height: 42px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      border: 1px solid #3a4c72;
+      background: #05070b;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .actions {
+      margin-top: 20px;
+    }
+
+    button,
+    a.button {
+      display: inline-block;
+      height: 40px;
+      margin: 0 10px 10px 0;
+      padding: 0 16px;
+      border: 0;
+      background: #0b7cff;
+      color: #fff;
+      font-size: 14px;
+      line-height: 40px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.secondary,
+    a.secondary {
+      background: #22314f;
+    }
+
+    #status {
+      min-height: 20px;
+      margin-top: 12px;
+      color: #9dbdff;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Design Dashboard Carousel</h1>
+
+    <label for="figmaToken">Token personal de Figma</label>
+    <input id="figmaToken" type="text" autocomplete="off" spellcheck="false">
+
+    <label for="fileKey">Figma file key</label>
+    <input id="fileKey" type="text" autocomplete="off" spellcheck="false">
+
+    <label for="pageName">Página</label>
+    <input id="pageName" type="text" autocomplete="off" spellcheck="false">
+
+    <div class="actions">
+      <button id="save" type="button">Guardar</button>
+      <button id="clearToken" type="button" class="secondary">Borrar token</button>
+      <a class="button secondary" href="/index.html">Ver carrusel</a>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    (function () {
+      var figmaToken = document.getElementById('figmaToken');
+      var fileKey = document.getElementById('fileKey');
+      var pageName = document.getElementById('pageName');
+      var save = document.getElementById('save');
+      var clearToken = document.getElementById('clearToken');
+      var status = document.getElementById('status');
+
+      function setStatus(text) {
+        status.innerHTML = text;
+      }
+
+      function loadConfig() {
+        setStatus('Cargando configuración...');
+        fetch('/api/carousel-config', { cache: 'no-store' }).then(function (res) {
+          if (!res.ok) throw new Error('No se pudo cargar la configuración.');
+          return res.json();
+        }).then(function (config) {
+          figmaToken.value = config.figmaToken || '';
+          fileKey.value = config.fileKey || '';
+          pageName.value = config.pageName || 'carousel';
+          setStatus('Configuración cargada.');
+        }).catch(function (err) {
+          setStatus(err.message || 'Error cargando configuración.');
+        });
+      }
+
+      function saveConfig(nextToken) {
+        setStatus('Guardando...');
+        fetch('/api/carousel-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            figmaToken: nextToken,
+            fileKey: fileKey.value,
+            pageName: pageName.value
+          })
+        }).then(function (res) {
+          if (!res.ok) throw new Error('No se pudo guardar.');
+          return res.json();
+        }).then(function (config) {
+          figmaToken.value = config.figmaToken || '';
+          fileKey.value = config.fileKey || '';
+          pageName.value = config.pageName || 'carousel';
+          setStatus('Guardado. El carrusel usará la nueva configuración al recargar o en la próxima comprobación.');
+        }).catch(function (err) {
+          setStatus(err.message || 'Error guardando configuración.');
+        });
+      }
+
+      save.onclick = function () {
+        saveConfig(figmaToken.value);
+      };
+
+      clearToken.onclick = function () {
+        figmaToken.value = '';
+        saveConfig('');
+      };
+
+      loadConfig();
+    })();
+  </script>
+</body>
+</html>
