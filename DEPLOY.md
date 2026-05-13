@@ -65,7 +65,7 @@ http://localhost:7777/index.html
 Remote admin:
 
 ```text
-http://raspberrydesign:7777/admin.html
+http://<device-hostname-or-ip>:7777/admin.html
 ```
 
 ## Configuration

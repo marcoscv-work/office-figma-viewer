@@ -205,7 +205,7 @@ Images are requested one by one to reduce blocking and memory pressure on older 
 ## Main States
 
 ```text
-no token         Shows a configuration error with the admin page URL.
+no token         Shows a configuration error with a clickable admin page link.
 loading          Reads local config, Figma file, and exported images.
 ready            Renders slides in a loop.
 error            Shows a centered black error screen.

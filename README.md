@@ -15,6 +15,12 @@ http://localhost:7777/index.html
 Remote admin page:
 
 ```text
+http://<device-hostname-or-ip>:7777/admin.html
+```
+
+For example, on the current Raspberry Pi:
+
+```text
 http://raspberrydesign:7777/admin.html
 ```
 
@@ -158,3 +164,10 @@ OPS.md                 Operations and troubleshooting.
 - The Figma token must not be committed. Keep it only in the Raspberry Pi `carousel-config.json`.
 - Slide transitions use a simple opacity fade for low resource usage.
 - The bottom progress bar is `8px` high and adapts to each slide duration.
+- Error screens link to the admin page using the current browser origin, so deployments on other hostnames or IP addresses work without code changes.
+
+## TV Browser Support
+
+The viewer can work in a TV browser if the browser supports modern enough JavaScript features used by the app: `fetch`, `Promise`, `WebSocket`, and basic CSS transitions. Many recent WebOS, Tizen, and Android TV browsers do, but older TV browsers can be inconsistent.
+
+For reliable signage, the Raspberry Pi kiosk remains the preferred runtime. It gives predictable Chromium behavior, autostart, and easier remote administration.

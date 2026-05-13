@@ -21,6 +21,12 @@ design-dashboard-carousel.service
 Open the remote admin page:
 
 ```text
+http://<device-hostname-or-ip>:7777/admin.html
+```
+
+For the current Raspberry Pi:
+
+```text
 http://raspberrydesign:7777/admin.html
 ```
 
@@ -72,6 +78,12 @@ Current choices:
 - Simple `opacity` transitions.
 - Progress bar animation through `requestAnimationFrame` with a lightweight fallback.
 
+## TV Browser Support
+
+The viewer may run directly in a TV browser if it supports `fetch`, `Promise`, `WebSocket`, and CSS transitions. Treat this as best-effort because built-in TV browsers vary a lot by vendor and model year.
+
+For production display use, prefer the Raspberry Pi kiosk.
+
 ## Figma Changes
 
 The viewer checks `lastModified` every 5 minutes.
@@ -92,7 +104,7 @@ When Figma changes:
 Open:
 
 ```text
-http://raspberrydesign:7777/admin.html
+http://<device-hostname-or-ip>:7777/admin.html
 ```
 
 Save a valid Figma token.
@@ -184,7 +196,7 @@ Dancing
 Use the remote admin page:
 
 ```text
-http://raspberrydesign:7777/admin.html
+http://<device-hostname-or-ip>:7777/admin.html
 ```
 
 Or edit:

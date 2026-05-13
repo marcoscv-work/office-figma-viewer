@@ -107,6 +107,11 @@
       line-height: 1.35;
     }
 
+    #messageText a {
+      color: #80b7ff;
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
@@ -158,6 +163,15 @@
         message.className = '';
       }
 
+      function getAdminUrl() {
+        return window.location.protocol + '//' + window.location.host + '/admin.html';
+      }
+
+      function adminLink(label) {
+        var url = getAdminUrl();
+        return '<a href="' + url + '">' + (label || url) + '</a>';
+      }
+
       function withTimeout(promise, ms, label) {
         var timer;
         var timeout = new Promise(function (resolve, reject) {
@@ -201,7 +215,7 @@
           return config;
         }).catch(function () {
           token = '';
-          showMessage('The local configuration could not be loaded.<br>Check <strong>http://raspberrydesign:7777/admin.html</strong>.');
+          showMessage('The local configuration could not be loaded.<br>Check ' + adminLink() + '.');
           return null;
         });
       }
@@ -362,7 +376,7 @@
 
         if (!token) {
           stopCarousel();
-          showMessage('No Figma token is configured.<br>Set it at <strong>http://raspberrydesign:7777/admin.html</strong>.');
+          showMessage('No Figma token is configured.<br>Set it at ' + adminLink() + '.');
           return Promise.resolve(false);
         }
 
@@ -396,7 +410,7 @@
           if (requestId !== loadRequestId) return false;
           stopCarousel();
           if (err && err.message === 'TOKEN') {
-            showMessage('The Figma token is missing or expired.<br>Open <strong>http://raspberrydesign:7777/admin.html</strong> and save a valid token.');
+            showMessage('The Figma token is missing or expired.<br>Open ' + adminLink() + ' and save a valid token.');
           } else if (err && err.message === 'PAGE') {
             showMessage('The configured page was not found in the Figma file.');
           } else if (err && err.message === 'SLIDES') {
