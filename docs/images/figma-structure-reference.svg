@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1778 976" role="img" aria-labelledby="title desc">
+  <title id="title">Figma structure reference</title>
+  <desc id="desc">A visual reference showing a numbered slide frame with Time and Effect groups outside the frame bounds.</desc>
+  <rect width="1778" height="976" fill="#1f1f1f"/>
+  <text x="306" y="106" fill="#9b9b9b" font-family="Arial, Helvetica, sans-serif" font-size="24">1</text>
+
+  <text x="160" y="178" fill="#f5f5f5" font-family="Arial, Helvetica, sans-serif" font-size="24">Slide time</text>
+  <text x="173" y="254" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="76">30</text>
+
+  <text x="137" y="348" fill="#f5f5f5" font-family="Arial, Helvetica, sans-serif" font-size="24">Light Effect</text>
+  <text x="118" y="396" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="44">Blends</text>
+
+  <rect x="306" y="126" width="1392" height="783" fill="#f8f8f8"/>
+  <line x1="374" y1="126" x2="374" y2="909" stroke="#ff7a6f" stroke-width="2"/>
+
+  <defs>
+    <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0057cf"/>
+      <stop offset="0.55" stop-color="#1455d8"/>
+      <stop offset="1" stop-color="#7a43ec"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#3459a6" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <text x="373" y="318" fill="url(#brandGradient)" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="132">Lexicon</text>
+  <text x="373" y="405" fill="#343543" font-family="Arial, Helvetica, sans-serif" font-size="67">Design Team</text>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#064bd3">
+    <g transform="translate(374 532)">
+      <circle cx="50" cy="0" r="49" fill="#0668e8" filter="url(#softShadow)"/>
+      <circle cx="50" cy="-8" r="27" fill="#e7c1a9"/>
+      <path d="M23 29c12-20 44-23 59 0v20H23z" fill="#2e3f50"/>
+      <text x="138" y="13">David Aragones</text>
+    </g>
+    <g transform="translate(374 662)">
+      <circle cx="50" cy="0" r="49" fill="#0668e8" filter="url(#softShadow)"/>
+      <circle cx="50" cy="-9" r="27" fill="#d0ad97"/>
+      <path d="M19 28c14-23 48-22 63 0v22H19z" fill="#f0f2f7"/>
+      <text x="138" y="13">Marcos Castro</text>
+    </g>
+    <g transform="translate(374 793)">
+      <circle cx="50" cy="0" r="49" fill="#0668e8" filter="url(#softShadow)"/>
+      <circle cx="50" cy="-9" r="27" fill="#e5c7b1"/>
+      <path d="M21 28c12-20 48-22 62 0v22H21z" fill="#f5f7fb"/>
+      <text x="138" y="13">Diego Alonso</text>
+    </g>
+  </g>
+
+  <g transform="translate(1125 433)" fill="none" stroke="url(#brandGradient)" stroke-linecap="round">
+    <path d="M15 228v-50c0-47 24-90 65-114l163-94c56-32 125-32 181 0l75 43" stroke-width="44"/>
+    <path d="M15 350v-94" stroke-width="44"/>
+    <path d="M110 486V229c0-44 24-85 63-107l110-63c32-18 71-18 103 0l103 60c39 23 63 64 63 109v102" stroke-width="44"/>
+    <path d="M205 398V251c0-29 15-55 40-70l80-46c13-7 29-7 42 0l86 50c25 15 41 41 41 70v69" stroke-width="44"/>
+    <path d="M300 468V284c0-15 8-29 21-36l30-17c10-6 22-6 32 0l37 21c13 8 21 21 21 36v76" stroke-width="44"/>
+    <path d="M394 501V330" stroke-width="44"/>
+    <path d="M300 518v30" stroke-width="44"/>
+    <path d="M552 465v68" stroke-width="44"/>
+    <path d="M631 96l57 33c46 27 75 76 75 129v164" stroke-width="44"/>
+  </g>
+</svg>

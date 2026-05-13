@@ -73,6 +73,10 @@ Each slide must be a top-level frame on that page with a numeric name:
 
 The carousel order is based on those numeric frame names.
 
+Visual reference for the expected Figma structure:
+
+![Figma structure reference showing numbered frames, Time > Seconds, and Effect > type](docs/images/figma-structure-reference.svg)
+
 Each frame is exported with these Figma image parameters:
 
 ```text

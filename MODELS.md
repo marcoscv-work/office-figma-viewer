@@ -52,6 +52,10 @@ Internal model built from each Figma frame:
 }
 ```
 
+Visual reference:
+
+![Figma structure reference showing numbered frames, Time > Seconds, and Effect > type](docs/images/figma-structure-reference.svg)
+
 ### `id`
 
 Figma node id for the frame. It is used when requesting the exported image from `/v1/images/:file_key`.
