@@ -170,4 +170,8 @@ OPS.md                 Operations and troubleshooting.
 
 The viewer can work in a TV browser if the browser supports modern enough JavaScript features used by the app: `fetch`, `Promise`, `WebSocket`, and basic CSS transitions. Many recent WebOS, Tizen, and Android TV browsers do, but older TV browsers can be inconsistent.
 
+Tested successfully on an LG TV from 2020:
+
+![Office Figma Viewer running on an LG TV from 2020](docs/images/lg-2020-tv.jpg)
+
 For reliable signage, the Raspberry Pi kiosk remains the preferred runtime. It gives predictable Chromium behavior, autostart, and easier remote administration.
