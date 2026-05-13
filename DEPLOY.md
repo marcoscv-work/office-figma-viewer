@@ -1,20 +1,20 @@
 # Deploy
 
-Guía rápida para instalar el visor en una Raspberry en modo kiosko.
+Quick installation guide for a Raspberry Pi running Chromium in kiosk mode.
 
-## Directorio
+## Directory
 
-Ruta usada en producción:
+Production path:
 
 ```text
 /home/pi/design-dashboard-carousel
 ```
 
-Copiar el contenido del repositorio a esa carpeta.
+Copy the repository contents into that directory.
 
-## Servicio
+## Service
 
-Instalar el servicio systemd:
+Install the systemd service:
 
 ```bash
 sudo cp deploy/design-dashboard-carousel.service /etc/systemd/system/design-dashboard-carousel.service
@@ -23,22 +23,22 @@ sudo systemctl enable design-dashboard-carousel.service
 sudo systemctl restart design-dashboard-carousel.service
 ```
 
-Verificar:
+Verify:
 
 ```bash
 systemctl status design-dashboard-carousel.service
 journalctl -u design-dashboard-carousel.service -n 50 --no-pager
 ```
 
-## Kiosko
+## Kiosk
 
-Editar:
+Edit:
 
 ```text
 /home/pi/.config/lxsession/LXDE-pi/autostart
 ```
 
-Contenido recomendado:
+Recommended contents:
 
 ```text
 @xset s off
@@ -48,7 +48,7 @@ Contenido recomendado:
 @unclutter -idle 0
 ```
 
-Hay una copia de referencia en:
+A reference copy is available at:
 
 ```text
 deploy/lxde-autostart
@@ -56,27 +56,27 @@ deploy/lxde-autostart
 
 ## URLs
 
-Carrusel:
+Carousel:
 
 ```text
 http://localhost:7777/index.html
 ```
 
-Admin remoto:
+Remote admin:
 
 ```text
 http://raspberrydesign:7777/admin.html
 ```
 
-## Configuración
+## Configuration
 
-El admin guarda:
+The admin page writes:
 
 ```text
 /home/pi/design-dashboard-carousel/carousel-config.json
 ```
 
-Formato:
+Shape:
 
 ```json
 {

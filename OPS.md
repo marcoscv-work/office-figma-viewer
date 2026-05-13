@@ -1,40 +1,40 @@
 # Operations
 
-Notas para operar el carrusel en una Raspberry con Chromium.
+Operational notes for running the carousel on a Raspberry Pi with Chromium in kiosk mode.
 
-## Arranque
+## Startup
 
-URL del kiosko:
+Kiosk URL:
 
 ```text
 http://localhost:7777/index.html
 ```
 
-Servidor:
+Service:
 
 ```text
 design-dashboard-carousel.service
 ```
 
-## Configuración
+## Configuration
 
-Abrir:
+Open the remote admin page:
 
 ```text
 http://raspberrydesign:7777/admin.html
 ```
 
-Guardar el token de Figma. El kiosko leerá la configuración desde el servidor local.
+Save a Figma token there. The kiosk reads the configuration from the local server.
 
-El token queda en:
+The token is stored in:
 
 ```text
 /home/pi/design-dashboard-carousel/carousel-config.json
 ```
 
-Para borrar el token, entrar en `admin.html` y pulsar `Borrar token`.
+To remove the token, open `admin.html` and click `Clear token`.
 
-## Servicio
+## Service Commands
 
 ```bash
 sudo systemctl status design-dashboard-carousel.service
@@ -43,15 +43,15 @@ sudo systemctl enable design-dashboard-carousel.service
 journalctl -u design-dashboard-carousel.service -n 50 --no-pager
 ```
 
-El servicio escucha en:
+The service listens at:
 
 ```text
 http://raspberrydesign:7777
 ```
 
-## Requisitos de Red
+## Network Requirements
 
-La Raspberry necesita acceso a:
+The Raspberry Pi needs access to:
 
 ```text
 http://raspberrydesign:7777
@@ -60,64 +60,64 @@ https://*.figma.com
 ws://designlights.local/ws
 ```
 
-Si las luces no están disponibles, el carrusel sigue funcionando. Solo no enviará efectos.
+If the light WebSocket is unavailable, the carousel still works. It simply skips light effects.
 
-## Rendimiento
+## Performance
 
-Decisiones actuales:
+Current choices:
 
-- `jpg` para reducir peso frente a PNG.
-- `scale=1` para mantener `1920x1080` en frames Full HD.
-- Exportación de imágenes una por una para evitar bloqueos largos en Chromium antiguo.
-- Transición por `opacity`, sin animaciones pesadas.
-- Barra de progreso con `requestAnimationFrame` y fallback ligero para Chromium antiguo.
+- `jpg` exports to reduce image weight compared with PNG.
+- `scale=1` to keep `1920x1080` output for Full HD frames.
+- One-by-one image export requests to avoid long stalls in older Chromium builds.
+- Simple `opacity` transitions.
+- Progress bar animation through `requestAnimationFrame` with a lightweight fallback.
 
-## Cambios en Figma
+## Figma Changes
 
-El HTML comprueba `lastModified` cada 5 minutos.
+The viewer checks `lastModified` every 5 minutes.
 
-Cuando Figma cambia:
+When Figma changes:
 
 ```text
-1. Vuelve a leer el archivo.
-2. Vuelve a exportar imágenes.
-3. Sustituye el listado de slides.
-4. Reinicia el carrusel con las nuevas slides.
+1. It reads the file again.
+2. It exports images again.
+3. It replaces the slide list.
+4. It restarts the carousel with the updated slides.
 ```
 
-## Problemas Comunes
+## Troubleshooting
 
-### Se queda en negro con "No hay token"
+### Black screen with "No Figma token is configured"
 
-Entra en:
+Open:
 
 ```text
 http://raspberrydesign:7777/admin.html
 ```
 
-Guarda un token válido de Figma.
+Save a valid Figma token.
 
-### Dice que el token ha caducado
+### Token expired or missing access
 
-El token no tiene acceso al archivo, se ha revocado o está mal pegado.
+The token may be revoked, mistyped, expired, or missing access to the file.
 
-Genera uno nuevo en Figma y guárdalo otra vez.
+Generate a new token in Figma and save it again.
 
-### No encuentra la página `carousel`
+### Configured page is not found
 
-Comprueba que la página se llame exactamente:
+Check that the Figma page name matches the configured value, usually:
 
 ```text
 carousel
 ```
 
-La comparación ignora mayúsculas y espacios extremos, pero no nombres distintos.
+Matching ignores case and leading/trailing spaces, but not a different name.
 
-### No encuentra slides
+### No slides found
 
-Los frames deben estar directamente dentro de la página `carousel` y empezar por número.
+Frames must be top-level children of the configured page and start with a number.
 
-Válido:
+Valid:
 
 ```text
 1
@@ -125,53 +125,53 @@ Válido:
 3 Intro
 ```
 
-No válido:
+Not valid:
 
 ```text
 Slide 1
 Home
 ```
 
-### La imagen sale con contenido de fuera del frame
+### Export includes content outside the frame
 
-La exportación debe incluir:
+The image request must include:
 
 ```text
 use_absolute_bounds=true
 contents_only=true
 ```
 
-Esto ya está configurado en `public/index.html`.
+This is already configured in `public/index.html`.
 
-### El tiempo no cambia
+### Slide duration does not change
 
-Comprueba que dentro del frame exista:
+Check that the frame contains:
 
 ```text
 Time
 └── Seconds
 ```
 
-`Seconds` debe ser un nodo de texto.
+`Seconds` must be a text node.
 
-### Las luces no se disparan
+### Lights do not trigger
 
-Comprueba:
+Check:
 
 ```text
 ws://designlights.local/ws
 ```
 
-Y que el frame tenga:
+And make sure the frame contains:
 
 ```text
 Effect
 └── type
 ```
 
-Si `type` es una instancia de componente, su variant property debe llamarse `type`.
+If `type` is a component instance, its variant property must be named `type`.
 
-Con uno de estos valores:
+Supported values:
 
 ```text
 Chase
@@ -179,21 +179,21 @@ Blends
 Dancing
 ```
 
-## Cambiar Archivo o Página
+## Change File or Page
 
-Usar el admin remoto:
+Use the remote admin page:
 
 ```text
 http://raspberrydesign:7777/admin.html
 ```
 
-O editar:
+Or edit:
 
 ```text
 /home/pi/design-dashboard-carousel/carousel-config.json
 ```
 
-Campos:
+Fields:
 
 ```json
 {
@@ -202,25 +202,25 @@ Campos:
 }
 ```
 
-## Cambiar Frecuencia de Refresco
+## Change Refresh Frequency
 
-Editar en `public/index.html`:
+Edit `public/index.html`:
 
 ```js
 var POLL_MS = 5 * 60 * 1000;
 ```
 
-## Cambiar Duración por Defecto
+## Change Default Duration
 
-Editar en `public/index.html`:
+Edit `public/index.html`:
 
 ```js
 var DEFAULT_SECONDS = 15;
 ```
 
-## Cambiar Payloads de Luz
+## Change Light Payloads
 
-Editar en `public/index.html`:
+Edit `public/index.html`:
 
 ```js
 var LIGHTS = {

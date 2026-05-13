@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -107,85 +107,6 @@
       line-height: 1.35;
     }
 
-    #adminPanel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      box-sizing: border-box;
-      z-index: 50;
-      background: #05070b;
-    }
-
-    #adminPanel.visible {
-      display: flex;
-    }
-
-    .admin-box {
-      width: 100%;
-      max-width: 560px;
-      padding: 24px;
-      box-sizing: border-box;
-      border: 1px solid #22314f;
-      background: #0b1020;
-    }
-
-    .admin-box h1 {
-      margin: 0 0 18px;
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .admin-box label {
-      display: block;
-      margin-bottom: 8px;
-      color: #bdd2ff;
-      font-size: 14px;
-    }
-
-    .admin-box input {
-      width: 100%;
-      height: 44px;
-      padding: 0 12px;
-      box-sizing: border-box;
-      border: 1px solid #3a4c72;
-      border-radius: 0;
-      background: #05070b;
-      color: #fff;
-      font-size: 15px;
-    }
-
-    .admin-actions {
-      display: flex;
-      margin-top: 16px;
-    }
-
-    .admin-actions button {
-      height: 40px;
-      margin-right: 10px;
-      padding: 0 16px;
-      border: 0;
-      background: #0b7cff;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .admin-actions button.secondary {
-      background: #22314f;
-    }
-
-    #adminStatus {
-      min-height: 20px;
-      margin-top: 14px;
-      color: #9dbdff;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -194,19 +115,6 @@
 
   <div id="message" role="status" aria-live="polite">
     <div id="messageText"></div>
-  </div>
-
-  <div id="adminPanel">
-    <div class="admin-box">
-      <h1>Configuración Figma</h1>
-      <label for="figmaToken">Token personal de Figma</label>
-      <input id="figmaToken" type="text" autocomplete="off" spellcheck="false">
-      <div class="admin-actions">
-        <button id="saveToken" type="button">Guardar</button>
-        <button id="clearToken" type="button" class="secondary">Borrar</button>
-      </div>
-      <div id="adminStatus"></div>
-    </div>
   </div>
 
   <script>
@@ -229,11 +137,6 @@
       var progressBar = document.getElementById('progressBar');
       var message = document.getElementById('message');
       var messageText = document.getElementById('messageText');
-      var adminPanel = document.getElementById('adminPanel');
-      var tokenInput = document.getElementById('figmaToken');
-      var saveToken = document.getElementById('saveToken');
-      var clearToken = document.getElementById('clearToken');
-      var adminStatus = document.getElementById('adminStatus');
 
       var token = '';
       var slides = [];
@@ -246,10 +149,6 @@
       var lightsReady = false;
       var loadRequestId = 0;
 
-      function isAdminMode() {
-        return window.location.search.indexOf('admin') !== -1;
-      }
-
       function showMessage(text) {
         messageText.innerHTML = text;
         message.className = 'visible';
@@ -257,16 +156,6 @@
 
       function hideMessage() {
         message.className = '';
-      }
-
-      function showAdmin(text) {
-        tokenInput.value = token;
-        adminStatus.innerHTML = text || '';
-        adminPanel.className = 'visible';
-      }
-
-      function hideAdmin() {
-        adminPanel.className = '';
       }
 
       function withTimeout(promise, ms, label) {
@@ -312,7 +201,7 @@
           return config;
         }).catch(function () {
           token = '';
-          showMessage('No se ha podido cargar la configuración local.<br>Revisa el servidor en <strong>http://raspberrydesign:7777/admin.html</strong>.');
+          showMessage('The local configuration could not be loaded.<br>Check <strong>http://raspberrydesign:7777/admin.html</strong>.');
           return null;
         });
       }
@@ -454,7 +343,7 @@
 
           slide = nextSlides[index];
           if (statusFn) {
-            statusFn('Exportando imagen ' + (index + 1) + ' de ' + nextSlides.length + '...');
+            statusFn('Exporting image ' + (index + 1) + ' of ' + nextSlides.length + '...');
           }
 
           return apiFetch('/images/' + encodeURIComponent(FILE_KEY) + '?ids=' + encodeURIComponent(slide.id) + '&format=' + IMAGE_FORMAT + '&scale=' + IMAGE_SCALE + '&contents_only=true&use_absolute_bounds=true').then(function (data) {
@@ -473,7 +362,7 @@
 
         if (!token) {
           stopCarousel();
-          showMessage('No hay token de Figma configurado.<br>Configúralo en <strong>http://raspberrydesign:7777/admin.html</strong>.');
+          showMessage('No Figma token is configured.<br>Set it at <strong>http://raspberrydesign:7777/admin.html</strong>.');
           return Promise.resolve(false);
         }
 
@@ -483,15 +372,15 @@
           }
         }
 
-        setStatus('Leyendo archivo de Figma...');
+        setStatus('Reading Figma file...');
         return apiFetch('/files/' + encodeURIComponent(FILE_KEY)).then(function (fileData) {
           if (requestId !== loadRequestId) return false;
           if (!force && lastModified && fileData.lastModified === lastModified) {
-            setStatus('No hay cambios nuevos en Figma.');
+            setStatus('No new changes in Figma.');
             return true;
           }
           lastModified = fileData.lastModified || String(new Date().getTime());
-          setStatus('Extrayendo slides...');
+          setStatus('Extracting slides...');
           return loadImageUrls(extractSlides(fileData), setStatus).then(function (nextSlides) {
             if (requestId !== loadRequestId) return false;
             if (!nextSlides.length) {
@@ -507,13 +396,13 @@
           if (requestId !== loadRequestId) return false;
           stopCarousel();
           if (err && err.message === 'TOKEN') {
-            showMessage('El token de Figma no está configurado o ha caducado.<br>Abre <strong>http://raspberrydesign:7777/admin.html</strong> y guarda un token válido.');
+            showMessage('The Figma token is missing or expired.<br>Open <strong>http://raspberrydesign:7777/admin.html</strong> and save a valid token.');
           } else if (err && err.message === 'PAGE') {
-            showMessage('No se ha encontrado la página <strong>carousel</strong> en el archivo de Figma.');
+            showMessage('The configured page was not found in the Figma file.');
           } else if (err && err.message === 'SLIDES') {
-            showMessage('No se han encontrado frames numerados en la página <strong>carousel</strong>.');
+            showMessage('No numbered frames were found on the configured Figma page.');
           } else {
-            showMessage('No se han podido extraer las slides de Figma.');
+            showMessage('Slides could not be extracted from Figma.');
           }
           setStatus(messageText.innerHTML.replace(/<[^>]+>/g, ' '));
           return false;
@@ -658,40 +547,9 @@
         }, POLL_MS);
       }
 
-      saveToken.onclick = function () {
-        token = tokenInput.value.replace(/^\s+|\s+$/g, '');
-        if (!token) {
-          adminStatus.innerHTML = 'Pega un token de Figma antes de guardar.';
-          return;
-        }
-        adminStatus.innerHTML = 'Token guardado. Probando conexión...';
-        lastModified = '';
-        loadSlides(true, function (text) {
-          adminStatus.innerHTML = text;
-        }).then(function (ok) {
-          if (ok) {
-            adminStatus.innerHTML = 'Listo. Abre <strong>/index.html</strong> para ver el carrusel.';
-          }
-        });
-      };
-
-      clearToken.onclick = function () {
-        token = '';
-        tokenInput.value = '';
-        stopCarousel();
-        stage.innerHTML = '';
-        adminStatus.innerHTML = 'Token borrado.';
-      };
-
       connectLights();
       startPolling();
 
-      if (isAdminMode()) {
-        window.location.href = '/admin.html';
-        return;
-      }
-
-      hideAdmin();
       loadServerConfig().then(function (config) {
         if (config) {
           loadSlides(true);

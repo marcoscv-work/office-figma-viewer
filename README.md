@@ -1,40 +1,40 @@
-# Design Dashboard Carousel
+# Office Figma Viewer
 
-Visualizador de slides para una pantalla controlada por Raspberry/Chromium.
+Slide carousel for an office display driven by a Raspberry Pi kiosk browser.
 
-El proyecto se sirve con un servidor Node pequeño en la Raspberry, sin build ni dependencias externas. Lee una página concreta de Figma, exporta sus frames como imágenes JPG y los muestra en bucle con una barra azul de progreso.
+The app runs through a small dependency-free Node server. It reads a configured Figma file, exports numbered frames from a page as clipped JPG images, and displays them in sequence with a blue progress bar.
 
-## Uso
+## Usage
 
-URL del kiosko:
+Kiosk URL:
 
 ```text
 http://localhost:7777/index.html
 ```
 
-Configuración remota:
+Remote admin page:
 
 ```text
 http://raspberrydesign:7777/admin.html
 ```
 
-Pega el token en el campo visible y pulsa `Guardar`. El token queda guardado en `carousel-config.json` dentro de la Raspberry.
+Paste a Figma personal access token into the admin page and click `Save`. The token is stored in `carousel-config.json` on the Raspberry Pi, not in the repository.
 
-## Raspberry
+## Raspberry Pi
 
-Directorio de despliegue:
+Deployment directory:
 
 ```text
 /home/pi/design-dashboard-carousel
 ```
 
-Servicio systemd:
+systemd service:
 
 ```text
 design-dashboard-carousel.service
 ```
 
-Comandos útiles:
+Useful commands:
 
 ```bash
 sudo systemctl status design-dashboard-carousel.service
@@ -44,19 +44,19 @@ journalctl -u design-dashboard-carousel.service -n 50 --no-pager
 
 ## Figma
 
-Archivo:
+Configured file:
 
 ```text
 https://www.figma.com/design/BidKDsJvOdDy0xuFXEMg1F/Design-Dashboard
 ```
 
-Página esperada:
+Expected page:
 
 ```text
 carousel
 ```
 
-Dentro de esa página, cada slide debe ser un frame de primer nivel con nombre numérico:
+Each slide must be a top-level frame on that page with a numeric name:
 
 ```text
 1
@@ -65,9 +65,9 @@ Dentro de esa página, cada slide debe ser un frame de primer nivel con nombre n
 4
 ```
 
-El orden del carrusel se calcula por ese número.
+The carousel order is based on those numeric frame names.
 
-Cada frame se exporta con estos parámetros de Figma:
+Each frame is exported with these Figma image parameters:
 
 ```text
 format=jpg
@@ -76,18 +76,18 @@ contents_only=true
 use_absolute_bounds=true
 ```
 
-Con frames de `1920x1080`, `scale=1` mantiene la salida final en `1920x1080`. `use_absolute_bounds=true` evita que Figma exporte contenido que sobresale fuera del área del frame.
+For `1920x1080` frames, `scale=1` keeps the exported image at `1920x1080`. `use_absolute_bounds=true` prevents content outside the frame bounds from being included in the export.
 
-## Tiempo de Slide
+## Slide Duration
 
-Cada frame puede incluir:
+Each frame may include:
 
 ```text
 Time
 └── Seconds
 ```
 
-`Seconds` debe ser un texto con el número de segundos. Ejemplos válidos:
+`Seconds` must be a text node containing the number of seconds. Valid examples:
 
 ```text
 15
@@ -95,18 +95,18 @@ Time
 15 seconds
 ```
 
-Si no existe, está vacío o no se puede leer, el carrusel usa `15` segundos.
+If the value is missing, empty, or unreadable, the carousel uses `15` seconds.
 
-## Efectos de Luz
+## Light Effects
 
-Cada frame puede incluir:
+Each frame may include:
 
 ```text
 Effect
 └── type
 ```
 
-Valores soportados:
+Supported values:
 
 ```text
 none
@@ -115,46 +115,46 @@ Blends
 Dancing
 ```
 
-`none` no envía nada. Los demás envían un payload por WebSocket a:
-
-`type` puede ser una instancia/variant component de Figma. El HTML lee primero `componentProperties.type.value` y, si no existe, usa el texto hijo visible.
+`none` sends nothing. The other values send a payload through WebSocket:
 
 ```text
 ws://designlights.local/ws
 ```
 
-## Refresco
+`type` may be a Figma component instance with a variant property. The viewer reads `componentProperties.type.value` first and falls back to the visible child text.
 
-El HTML comprueba cambios en Figma cada 5 minutos usando `lastModified`.
+## Refresh
 
-Si detecta cambios, vuelve a leer los frames y refresca las imágenes exportadas.
+The viewer checks Figma every 5 minutes using the file `lastModified` value.
 
-## Errores Visibles
+When a change is detected, it reloads the frames and refreshes the exported images.
 
-El carrusel muestra pantalla negra con mensaje cuando:
+## Visible Errors
 
-- No hay token configurado.
-- El token ha caducado o no tiene permisos.
-- No existe la página `carousel`.
-- No hay frames numerados.
-- Figma no devuelve imágenes exportables.
+The carousel shows a black error screen when:
 
-## Archivos
+- No token is configured.
+- The token is expired or does not have access.
+- The configured Figma page does not exist.
+- No numbered frames are found.
+- Figma does not return exportable images.
+
+## Files
 
 ```text
-server.js              Servidor HTTP en puerto 7777 + API de configuración.
-carousel-config.json   Token, file key y página de Figma.
-public/index.html      Carrusel del kiosko.
-public/admin.html      Configuración remota.
-DEPLOY.md              Instalación de systemd y autostart.
-README.md              Guía de uso.
-MODELS.md              Contrato de datos y estructura esperada en Figma.
-OPS.md                 Operación en Raspberry/Chromium y solución de problemas.
+server.js              HTTP server on port 7777 + configuration API.
+carousel-config.json   Empty default config; local deployments store the real token here.
+public/index.html      Kiosk carousel.
+public/admin.html      Remote configuration page.
+DEPLOY.md              systemd and kiosk autostart installation notes.
+README.md              Usage guide.
+MODELS.md              Data contract and expected Figma structure.
+OPS.md                 Operations and troubleshooting.
 ```
 
-## Notas
+## Notes
 
-- No hay seguridad en la pantalla de administración; está pensada para entorno controlado.
-- El token no se guarda en el código, solo en `carousel-config.json` en la Raspberry.
-- La transición entre slides es una opacidad simple para consumir pocos recursos.
-- La barra azul inferior mide `8px` y se adapta a la duración de cada slide.
+- The admin page has no authentication. It is intended for a controlled local network.
+- The Figma token must not be committed. Keep it only in the Raspberry Pi `carousel-config.json`.
+- Slide transitions use a simple opacity fade for low resource usage.
+- The bottom progress bar is `8px` high and adapts to each slide duration.

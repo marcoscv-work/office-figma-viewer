@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -88,19 +88,19 @@
   <div class="box">
     <h1>Design Dashboard Carousel</h1>
 
-    <label for="figmaToken">Token personal de Figma</label>
+    <label for="figmaToken">Figma personal access token</label>
     <input id="figmaToken" type="text" autocomplete="off" spellcheck="false">
 
     <label for="fileKey">Figma file key</label>
     <input id="fileKey" type="text" autocomplete="off" spellcheck="false">
 
-    <label for="pageName">Página</label>
+    <label for="pageName">Page</label>
     <input id="pageName" type="text" autocomplete="off" spellcheck="false">
 
     <div class="actions">
-      <button id="save" type="button">Guardar</button>
-      <button id="clearToken" type="button" class="secondary">Borrar token</button>
-      <a class="button secondary" href="/index.html">Ver carrusel</a>
+      <button id="save" type="button">Save</button>
+      <button id="clearToken" type="button" class="secondary">Clear token</button>
+      <a class="button secondary" href="/index.html">View carousel</a>
     </div>
 
     <div id="status"></div>
@@ -120,22 +120,22 @@
       }
 
       function loadConfig() {
-        setStatus('Cargando configuración...');
+        setStatus('Loading configuration...');
         fetch('/api/carousel-config', { cache: 'no-store' }).then(function (res) {
-          if (!res.ok) throw new Error('No se pudo cargar la configuración.');
+          if (!res.ok) throw new Error('Configuration could not be loaded.');
           return res.json();
         }).then(function (config) {
           figmaToken.value = config.figmaToken || '';
           fileKey.value = config.fileKey || '';
           pageName.value = config.pageName || 'carousel';
-          setStatus('Configuración cargada.');
+          setStatus('Configuration loaded.');
         }).catch(function (err) {
-          setStatus(err.message || 'Error cargando configuración.');
+          setStatus(err.message || 'Error loading configuration.');
         });
       }
 
       function saveConfig(nextToken) {
-        setStatus('Guardando...');
+        setStatus('Saving...');
         fetch('/api/carousel-config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -145,15 +145,15 @@
             pageName: pageName.value
           })
         }).then(function (res) {
-          if (!res.ok) throw new Error('No se pudo guardar.');
+          if (!res.ok) throw new Error('Configuration could not be saved.');
           return res.json();
         }).then(function (config) {
           figmaToken.value = config.figmaToken || '';
           fileKey.value = config.fileKey || '';
           pageName.value = config.pageName || 'carousel';
-          setStatus('Guardado. El carrusel usará la nueva configuración al recargar o en la próxima comprobación.');
+          setStatus('Saved. The carousel will use the new configuration after reload or during the next refresh check.');
         }).catch(function (err) {
-          setStatus(err.message || 'Error guardando configuración.');
+          setStatus(err.message || 'Error saving configuration.');
         });
       }
 

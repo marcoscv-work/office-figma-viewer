@@ -1,8 +1,8 @@
 # Models
 
-Contrato de datos entre Figma y `index.html`.
+Data contract between Figma, the local configuration API, and `public/index.html`.
 
-## Configuración Fija
+## Fixed Runtime Values
 
 ```js
 POLL_MS = 300000
@@ -12,15 +12,35 @@ IMAGE_FORMAT = "jpg"
 LIGHTS_URL = "ws://designlights.local/ws"
 ```
 
-`fileKey`, `pageName` y `figmaToken` se leen desde:
+`figmaToken`, `fileKey`, and `pageName` are read from:
 
 ```text
 /api/carousel-config
 ```
 
+## Local Configuration
+
+Stored on the Raspberry Pi as:
+
+```text
+/home/pi/design-dashboard-carousel/carousel-config.json
+```
+
+Shape:
+
+```json
+{
+  "figmaToken": "",
+  "fileKey": "BidKDsJvOdDy0xuFXEMg1F",
+  "pageName": "carousel"
+}
+```
+
+The repository version keeps `figmaToken` empty.
+
 ## Slide
 
-Modelo interno que el HTML construye a partir de cada frame:
+Internal model built from each Figma frame:
 
 ```js
 {
@@ -34,13 +54,13 @@ Modelo interno que el HTML construye a partir de cada frame:
 
 ### `id`
 
-Node id del frame en Figma. Se usa para pedir la imagen exportada al endpoint `/v1/images/:file_key`.
+Figma node id for the frame. It is used when requesting the exported image from `/v1/images/:file_key`.
 
 ### `name`
 
-Nombre del frame. Solo entran frames de primer nivel dentro de la página `carousel` cuyo nombre empieza por número.
+Frame name. Only top-level frames inside the configured page whose names start with a number are included.
 
-El orden es numérico ascendente:
+Order is numeric ascending:
 
 ```text
 1, 2, 3, 4...
@@ -48,9 +68,9 @@ El orden es numérico ascendente:
 
 ### `seconds`
 
-Duración del slide en segundos.
+Slide duration in seconds.
 
-Origen en Figma:
+Figma structure:
 
 ```text
 Frame
@@ -58,7 +78,7 @@ Frame
     └── Seconds
 ```
 
-Se lee el primer nodo de texto llamado `Seconds` dentro de un grupo llamado `Time`. El parser extrae el primer número que encuentre.
+The parser reads the first text node named `Seconds` inside a group named `Time`, then extracts the first number it finds.
 
 Fallback:
 
@@ -68,9 +88,9 @@ Fallback:
 
 ### `effect`
 
-Efecto de luz que se dispara al entrar el slide.
+Light effect triggered when the slide becomes active.
 
-Origen en Figma:
+Figma structure:
 
 ```text
 Frame
@@ -78,15 +98,15 @@ Frame
     └── type
 ```
 
-`type` puede ser una instancia de componente con variante. En ese caso se lee:
+`type` may be a Figma component instance with a variant property. In that case the viewer reads:
 
 ```js
 node.componentProperties.type.value
 ```
 
-Si no existe esa propiedad, se lee el primer texto visible dentro de `type`.
+If that property is missing, the viewer reads the first visible text node inside `type`.
 
-Valores normalizados:
+Normalized values:
 
 ```text
 none
@@ -95,13 +115,13 @@ blends
 dancing
 ```
 
-Cualquier valor no reconocido se convierte en `none`.
+Any unknown value becomes `none`.
 
 ### `imageUrl`
 
-URL temporal devuelta por Figma para la imagen exportada.
+Temporary URL returned by Figma for the exported frame image.
 
-Parámetros de exportación:
+Export parameters:
 
 ```text
 format=jpg
@@ -110,9 +130,9 @@ contents_only=true
 use_absolute_bounds=true
 ```
 
-Con frames `1920x1080`, la imagen resultante debe ser `1920x1080`.
+For `1920x1080` frames, the resulting image should be `1920x1080`.
 
-## Payloads de Luz
+## Light Payloads
 
 ### Chase
 
@@ -132,53 +152,78 @@ Con frames `1920x1080`, la imagen resultante debe ser `1920x1080`.
 {"on":true,"bri":255,"playlist":{"ps":[8],"dur":[150],"transition":0,"repeat":1,"end":4}}
 ```
 
-## Endpoints de Figma
+## Local API
 
-### Leer archivo
+### Read Configuration
+
+```text
+GET /api/carousel-config
+```
+
+### Write Configuration
+
+```text
+POST /api/carousel-config
+Content-Type: application/json
+```
+
+Body:
+
+```json
+{
+  "figmaToken": "",
+  "fileKey": "BidKDsJvOdDy0xuFXEMg1F",
+  "pageName": "carousel"
+}
+```
+
+## Figma API
+
+### Read File
 
 ```text
 GET https://api.figma.com/v1/files/:file_key
 X-Figma-Token: <token>
 ```
 
-Se usa para:
+Used to:
 
-- Encontrar la página `carousel`.
-- Leer frames.
-- Leer `lastModified`.
-- Leer textos `Time > Seconds` y `Effect > type`.
+- Find the configured page.
+- Read frames.
+- Read `lastModified`.
+- Read `Time > Seconds` and `Effect > type`.
 
-### Exportar imagen
+### Export Image
 
 ```text
 GET https://api.figma.com/v1/images/:file_key?ids=:node_id&format=jpg&scale=1&contents_only=true&use_absolute_bounds=true
 X-Figma-Token: <token>
 ```
 
-Las imágenes se piden una por una para reducir bloqueos y consumo en Chromium antiguo.
+Images are requested one by one to reduce blocking and memory pressure on older Chromium builds.
 
-## Estados Principales
+## Main States
 
 ```text
-sin token        Muestra error de configuración con enlace al admin remoto.
-cargando         Lee configuración, archivo Figma y exporta imágenes.
-listo            Renderiza slides en bucle.
-error            Muestra mensaje negro centrado.
-admin remoto     Se sirve desde /admin.html.
+no token         Shows a configuration error with the admin page URL.
+loading          Reads local config, Figma file, and exported images.
+ready            Renders slides in a loop.
+error            Shows a centered black error screen.
+remote admin     Served from /admin.html.
 ```
 
-## Ciclo de Carga
+## Load Cycle
 
 ```text
 1. GET /api/carousel-config.
-2. Leer token, fileKey y pageName desde el JSON local.
+2. Read token, fileKey, and pageName from the local JSON config.
 3. GET /files/:file_key.
-4. Buscar la página configurada.
-5. Filtrar frames numerados.
-6. Ordenar por nombre numérico.
-7. Leer seconds y effect.
-8. Exportar cada frame como JPG.
-9. Renderizar <div class="slide"><img></div>.
-10. Iniciar el bucle.
-11. Repetir comprobación cada 5 minutos.
+4. Find the configured page.
+5. Filter numbered frames.
+6. Sort frames by numeric name.
+7. Read seconds and effect.
+8. Export each frame as JPG.
+9. Render <div class="slide"><img></div>.
+10. Start the carousel loop.
+11. Repeat the check every 5 minutes.
 ```
