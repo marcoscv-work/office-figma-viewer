@@ -126,7 +126,7 @@
     (function () {
       var FILE_KEY = 'BidKDsJvOdDy0xuFXEMg1F';
       var PAGE_NAME = 'carousel';
-      var POLL_MS = 5 * 60 * 1000;
+      var POLL_MS = 30 * 1000;
       var DEFAULT_SECONDS = 15;
       var IMAGE_SCALE = 1;
       var IMAGE_FORMAT = 'jpg';
@@ -137,6 +137,7 @@
         dancing: '{"on":true,"bri":255,"playlist":{"ps":[8],"dur":[150],"transition":0,"repeat":1,"end":4}}'
       };
       var REQUEST_TIMEOUT_MS = 20000;
+      var ERROR_RETRY_MS = 10 * 60 * 1000;
 
       var stage = document.getElementById('stage');
       var progressBar = document.getElementById('progressBar');
@@ -150,17 +151,42 @@
       var progressFrame = null;
       var pollTimer = null;
       var lastModified = '';
+      var lastConfigKey = '';
       var lightsSocket = null;
       var lightsReady = false;
       var loadRequestId = 0;
+      var errorRetryTimer = null;
+
+      function configKey(config) {
+        return [config && config.figmaToken || '', config && config.fileKey || '', config && config.pageName || ''].join('|');
+      }
 
       function showMessage(text) {
         messageText.innerHTML = text;
         message.className = 'visible';
+        scheduleErrorRetry();
       }
 
       function hideMessage() {
         message.className = '';
+        cancelErrorRetry();
+      }
+
+      function scheduleErrorRetry() {
+        if (errorRetryTimer) return;
+        errorRetryTimer = setTimeout(function () {
+          errorRetryTimer = null;
+          if (message.className === 'visible') {
+            window.location.reload();
+          }
+        }, ERROR_RETRY_MS);
+      }
+
+      function cancelErrorRetry() {
+        if (errorRetryTimer) {
+          clearTimeout(errorRetryTimer);
+          errorRetryTimer = null;
+        }
       }
 
       function getAdminUrl() {
@@ -554,9 +580,11 @@
         clearInterval(pollTimer);
         pollTimer = setInterval(function () {
           loadServerConfig().then(function (config) {
-            if (config) {
-              loadSlides(false);
-            }
+            if (!config) return;
+            var key = configKey(config);
+            var changed = key !== lastConfigKey;
+            lastConfigKey = key;
+            loadSlides(changed);
           });
         }, POLL_MS);
       }
@@ -566,6 +594,7 @@
 
       loadServerConfig().then(function (config) {
         if (config) {
+          lastConfigKey = configKey(config);
           loadSlides(true);
         }
       });

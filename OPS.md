@@ -63,10 +63,15 @@ The Raspberry Pi needs access to:
 http://raspberrydesign:7777
 https://api.figma.com
 https://*.figma.com
+```
+
+Optional WLED light effects use:
+
+```text
 ws://designlights.local/ws
 ```
 
-If the light WebSocket is unavailable, the carousel still works. It simply skips light effects.
+WLED is not required to run the viewer. If the light WebSocket is unavailable, the carousel still works and simply skips light effects.
 
 ## Performance
 
@@ -86,15 +91,14 @@ For production display use, prefer the Raspberry Pi kiosk.
 
 ## Figma Changes
 
-The viewer checks `lastModified` every 5 minutes.
-
-When Figma changes:
+The viewer polls every 30 seconds. Each tick:
 
 ```text
-1. It reads the file again.
-2. It exports images again.
-3. It replaces the slide list.
-4. It restarts the carousel with the updated slides.
+1. It re-reads the local config from /api/carousel-config.
+2. If token, fileKey, or pageName changed, it forces a full reload.
+3. Otherwise it reads the Figma file and compares `lastModified`.
+4. If Figma changed, it re-exports images and rebuilds the slide list.
+5. The carousel restarts with the updated slides.
 ```
 
 ## Troubleshooting
@@ -168,6 +172,8 @@ Time
 
 ### Lights do not trigger
 
+Light effects are optional and only work when a WLED device is available on the configured WebSocket host.
+
 Check:
 
 ```text
@@ -219,8 +225,10 @@ Fields:
 Edit `public/index.html`:
 
 ```js
-var POLL_MS = 5 * 60 * 1000;
+var POLL_MS = 30 * 1000;
 ```
+
+Lower values pick up admin changes faster at the cost of more requests to the local server and to Figma.
 
 ## Change Default Duration
 

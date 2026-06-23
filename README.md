@@ -109,6 +109,10 @@ If the value is missing, empty, or unreadable, the carousel uses `15` seconds.
 
 ## Light Effects
 
+Light effects are optional. The carousel works fully without any lighting hardware.
+
+If available, the viewer can send WLED playlist commands to an extra WLED device through WebSocket. This is only used to synchronize ambient lights with each slide.
+
 Each frame may include:
 
 ```text
@@ -131,13 +135,18 @@ Dancing
 ws://designlights.local/ws
 ```
 
+If that WebSocket host is missing, offline, or unreachable, slides continue normally and only the light effect is skipped.
+
 `type` may be a Figma component instance with a variant property. The viewer reads `componentProperties.type.value` first and falls back to the visible child text.
 
 ## Refresh
 
-The viewer checks Figma every 5 minutes using the file `lastModified` value.
+The viewer polls every 30 seconds. On each tick it:
 
-When a change is detected, it reloads the frames and refreshes the exported images.
+- Reads the local server config (`/api/carousel-config`). If the token, file key, or page name changed since the last tick, it forces a full reload.
+- Otherwise it checks the Figma file `lastModified` and reloads the frames and images only when Figma has changed.
+
+This means saving from `admin.html` is reflected on the kiosk within ~30 seconds, without manual reload.
 
 ## Visible Errors
 
@@ -148,6 +157,8 @@ The carousel shows a black error screen when:
 - The configured Figma page does not exist.
 - No numbered frames are found.
 - Figma does not return exportable images.
+
+While an error screen is visible, the viewer automatically retries after 10 minutes by performing a full page reload. If the reload succeeds the error clears; otherwise it keeps retrying every 10 minutes until Figma is reachable again.
 
 ## Files
 

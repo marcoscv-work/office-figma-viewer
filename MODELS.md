@@ -138,6 +138,10 @@ For `1920x1080` frames, the resulting image should be `1920x1080`.
 
 ## Light Payloads
 
+WLED integration is optional. These payloads are sent only when `Effect > type` resolves to a supported value and the WLED WebSocket at `ws://designlights.local/ws` is reachable.
+
+The carousel does not depend on WLED. If the socket cannot connect, the viewer keeps running and silently skips light commands.
+
 ### Chase
 
 ```json
